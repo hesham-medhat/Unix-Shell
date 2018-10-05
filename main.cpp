@@ -2,6 +2,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <vector>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <a.out.h>
 
 using namespace std;
 
@@ -10,20 +13,17 @@ void printErrorMessage(const char* errorMessage) {
 }
 
 void toCharArray(string& string, char* array) {
-    for (int i = 0; i < string.size(); i++) array[i] = string.at(i);
+    for (unsigned i = 0; i < string.size(); i++) array[i] = string.at(i);
     array[string.size()] = '\0';// Terminate
 }
-
-bool isWhiteSpace(char character) { return character == ' ' || character == '\t'; }
 
 vector<char*> parseArgs(char* line) {
     vector<char*> argsVector;
 
-    int i = 0;
     char* token = strtok(line, " ");
-    while (token != NULL) {
+    while (token != nullptr) {
         argsVector.push_back(token);
-        token = strtok(NULL, " ");
+        token = strtok(nullptr, " ");
     }
     return argsVector;
 }
@@ -32,8 +32,15 @@ void executeCommand(char* line) {
     vector<char*> argsVector = parseArgs(line);
     if (argsVector.empty()) {
         printErrorMessage("No command passed.");
+    } else if (argsVector.size() == 1) {
+        if (fork() != 0) wait(nullptr);
+        else execvp(argsVector.at(0), &argsVector.at(0));
     } else {
+       if (argsVector.at(argsVector.size() - 1) == "&") {
+
+       }
         // TODO: Execute the command
+
     }
 }
 

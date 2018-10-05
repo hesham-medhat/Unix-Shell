@@ -15,4 +15,10 @@ cstring
 -
 vector
 -
+sys/wait.h
+-
+unistd.h
+-
+a.out.h
+-
 
