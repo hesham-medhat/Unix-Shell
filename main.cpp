@@ -4,7 +4,7 @@
 #include <vector>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <a.out.h>
+#include <fstream>
 
 using namespace std;
 
@@ -15,6 +15,11 @@ void printErrorMessage(const char* errorMessage) {
 void toCharArray(string& string, char* array) {
     for (unsigned i = 0; i < string.size(); i++) array[i] = string.at(i);
     array[string.size()] = '\0';// Terminate
+}
+
+void logProcessTermination() {
+    ofstream file("Process termination.log", ios_base::app);
+    file << "Child process was terminated.\n";
 }
 
 vector<char*> parseArgs(char* line) {
@@ -43,8 +48,8 @@ void executeCommand(char* line) {
                 cout << "Running in background" << endl;
             } else {
                 if (fork() != 0) { // Process termination handler
-                    wait(0);
-                    cout << "Process terminated" << endl; // TODO: Log in file
+                    wait(nullptr);
+                    logProcessTermination();
                     exit(-1);
                 } else {
                     execvp(args[0], args);
@@ -59,7 +64,7 @@ void executeCommand(char* line) {
             char* args[argsVector.size()];
             for (int i = 0; i < argsVector.size(); i++) args[i] = argsVector[i];
 
-            if (fork() != 0) wait(0);
+            if (fork() != 0) wait(nullptr);
             else {
                 execvp(args[0], args);
                 // Only returns on failure
@@ -75,7 +80,7 @@ int main() {
     bool exited = false;
     string line;
     while (!exited) {
-        printf("H Shell: Enter command: ");
+        cout << "H Shell: Here to take your next command! > ";
         getline(cin, line);
 
         if (line == "exit") {
